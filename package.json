@@ -1,0 +1,30 @@
+{
+  "name": "hashed-port",
+  "version": "0.1.0",
+  "description": "Get a port number with a hash function",
+  "author": "Kengo Nakatsuka <kengo.nakatsuka@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/nak2k/node-hashed-port/issues"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "tape": "^4.9.2"
+  },
+  "homepage": "https://github.com/nak2k/node-hashed-port",
+  "keywords": [],
+  "license": "MIT",
+  "main": "lib",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nak2k/node-hashed-port.git"
+  },
+  "scripts": {
+    "prepublishOnly": "npm test",
+    "postpublish": "npm-sns",
+    "test": "tape test/*.js"
+  },
+  "files": [
+    "README.md",
+    "lib/"
+  ]
+}
