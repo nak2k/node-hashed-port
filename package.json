@@ -1,6 +1,6 @@
 {
   "name": "hashed-port",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Get a port number with a hash function",
   "author": "Kengo Nakatsuka <kengo.nakatsuka@gmail.com>",
   "bugs": {
