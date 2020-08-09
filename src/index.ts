@@ -8,13 +8,35 @@ interface getPortOptions {
 
 type getPortCallback = (err: Error | null, port?: number) => void;
 
+export function getPort(options?: getPortOptions | string): Promise<number>;
+export function getPort(options: getPortOptions | string, callback: getPortCallback): void;
 export function getPort(options: getPortCallback): void;
-export function getPort(options: getPortOptions | getPortCallback | string, callback?: getPortCallback): void {
+export function getPort(options?: getPortOptions | string | getPortCallback, callback?: getPortCallback): void | Promise<number> {
+  let promise: Promise<number> | undefined;
+
   if (typeof options === 'function') {
     [options, callback] = [{}, options as getPortCallback];
+  } else if (callback === undefined) {
+    let resolve_: (port: number) => void;
+    let reject_: (err: Error) => void;
+
+    promise = new Promise<number>((resolve, reject) => {
+      resolve_ = resolve;
+      reject_ = reject;
+    });
+
+    callback = (err: Error | null, port?: number) => {
+      if (err) {
+        reject_(err);
+      } else {
+        resolve_(port!);
+      }
+    };
   }
 
-  if (typeof options === 'string') {
+  if (options === undefined) {
+    options = {};
+  } else if (typeof options === 'string') {
     options = { key: options };
   }
 
@@ -59,6 +81,10 @@ export function getPort(options: getPortOptions | getPortCallback | string, call
       callback!(null, port);
     });
   });
+
+  if (promise) {
+    return promise;
+  }
 }
 
 function findPort(key: string, begin: number, end: number, usedPorts: number[]) {

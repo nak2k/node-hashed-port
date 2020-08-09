@@ -13,6 +13,14 @@ test('test', t => {
 });
 
 test('test', t => {
+  t.plan(1);
+
+  getPort()
+    .then(port => t.equal(typeof port, 'number'))
+    .catch(err => t.fail());
+});
+
+test('test', t => {
   t.plan(2);
 
   delete process.env.npm_package_name;
@@ -33,4 +41,14 @@ test('test', t => {
     debug(err);
     t.ok(err instanceof Error);
   });
+});
+
+test('test', t => {
+  t.plan(1);
+
+  delete process.env.npm_package_name;
+
+  getPort('hashed-port')
+    .then(port => t.equal(typeof port, 'number'))
+    .catch(err => t.fail());
 });
