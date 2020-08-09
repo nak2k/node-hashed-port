@@ -1,10 +1,17 @@
-const { createHash } = require('crypto');
-const { readFile, writeFile } = require('fs');
-const { homedir } = require('os');
+import { createHash } from 'crypto';
+import { readFile, writeFile } from 'fs';
+import { homedir } from 'os';
 
-function getPort(options, callback) {
+interface getPortOptions {
+  key?: string;
+}
+
+type getPortCallback = (err: Error | null, port?: number) => void;
+
+export function getPort(options: getPortCallback): void;
+export function getPort(options: getPortOptions | getPortCallback | string, callback?: getPortCallback): void {
   if (typeof options === 'function') {
-    [options, callback] = [{}, options];
+    [options, callback] = [{}, options as getPortCallback];
   }
 
   if (typeof options === 'string') {
@@ -15,7 +22,7 @@ function getPort(options, callback) {
 
   readJsonFile(configPath, (err, config) => {
     if (err) {
-      return callback(err);
+      return callback!(err);
     }
 
     const {
@@ -25,14 +32,14 @@ function getPort(options, callback) {
 
     const {
       key = process.env.npm_package_name,
-    } = options;
+    } = options as getPortOptions;
 
     if (key === undefined) {
-      return callback(new Error('Either `options.key` or the environment variable `npm_package_name` must be specified'));
+      return callback!(new Error('Either `options.key` or the environment variable `npm_package_name` must be specified'));
     }
 
     if (ports[key]) {
-      return callback(null, ports[key]);
+      return callback!(null, ports[key]);
     }
 
     const {
@@ -46,15 +53,15 @@ function getPort(options, callback) {
 
     writeFile(configPath, JSON.stringify(config, null, 2), err => {
       if (err) {
-        return callback(err);
+        return callback!(err);
       }
 
-      callback(null, port);
+      callback!(null, port);
     });
   });
 }
 
-function findPort(key, begin, end, usedPorts) {
+function findPort(key: string, begin: number, end: number, usedPorts: number[]) {
   const md5hash = createHash('md5');
   md5hash.update(key);
   const hash = md5hash.digest().readUInt32LE(0);
@@ -75,7 +82,7 @@ function findPort(key, begin, end, usedPorts) {
   return 0;
 }
 
-function readJsonFile(path, callback) {
+function readJsonFile(path: string, callback: (err: Error | null, result?: any) => void) {
   readFile(path, 'utf8', (err, data) => {
     if (err) {
       if (err.code === 'ENOENT') {
@@ -92,8 +99,3 @@ function readJsonFile(path, callback) {
     }
   });
 }
-
-/*
- * Exports.
- */
-exports.getPort = getPort;
